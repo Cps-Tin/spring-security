@@ -1,2 +1,2 @@
-[SpringBoot集成Spring Security（1）——入门程序]( https://blog.csdn.net/yuanlaijike/article/details/80249235 )
+[SpringBoot集成Spring Security系列](https://blog.csdn.net/yuanlaijike/category_9283872.html)
 
