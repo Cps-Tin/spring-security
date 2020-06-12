@@ -17,8 +17,12 @@ public class SysRoleService {
     @Autowired
     private SysRoleMapper roleMapper;
 
-    public SysRole selectById(Integer id){
+    public SysRole selectById(Integer id) {
         return roleMapper.selectById(id);
+    }
+
+    public SysRole selectByName(String name) {
+        return roleMapper.selectByName(name);
     }
 
 }

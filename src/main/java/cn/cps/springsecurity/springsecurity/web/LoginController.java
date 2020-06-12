@@ -38,19 +38,20 @@ public class LoginController {
         return "login.html";
     }
 
+
     @RequestMapping("/admin")
     @ResponseBody
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public String printAdmin() {
-        return "如果你看见这句话，说明你有ROLE_ADMIN角色";
+    @PreAuthorize("hasPermission('/admin','r')")
+    public String printAdminR() {
+        return "如果你看见这句话，说明你访问/admin路径具有r权限";
     }
 
 
-    @RequestMapping("/user")
+    @RequestMapping("/admin/c")
     @ResponseBody
-    @PreAuthorize("hasRole('ROLE_USER')")
-    public String printUser() {
-        return "如果你看见这句话，说明你有ROLE_USER角色";
+    @PreAuthorize("hasPermission('/admin','c')")
+    public String printAdminC() {
+        return "如果你看见这句话，说明你访问/admin路径具有c权限";
     }
 
 

@@ -9,7 +9,7 @@ import java.io.Serializable;
 /**
  * @Author: Cai Peishen
  * @Date: 2020/6/12 11:01
- * @Description:
+ * @Description: 用户实体类
  */
 @Data
 @NoArgsConstructor
