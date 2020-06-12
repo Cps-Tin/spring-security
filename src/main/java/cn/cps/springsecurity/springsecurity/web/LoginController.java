@@ -3,6 +3,8 @@ package cn.cps.springsecurity.springsecurity.web;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.RememberMeAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,5 +44,18 @@ public class LoginController {
     @PreAuthorize("hasRole('ROLE_USER')")
     public String printUser() {
         return "如果你看见这句话，说明你有ROLE_USER角色";
+    }
+
+    /**
+     * 区分是密码登录还是记住我
+     * @return
+     */
+    public boolean isRemembermeUser(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication==null){
+            return false;
+        }
+        //判断当前用户是否是通过rememberme登录，是返回true,否返回false
+        return RememberMeAuthenticationToken.class.isAssignableFrom(authentication.getClass());
     }
 }
