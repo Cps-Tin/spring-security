@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * @Author: Cai Peishen
  * @Date: 2020/6/12 11:08
- * @Description:
+ * @Description: 登录认证处理
  */
 @Service("userDetailsService")
 public class CustomUserDetailsService implements UserDetailsService {

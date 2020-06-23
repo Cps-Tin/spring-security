@@ -1,4 +1,4 @@
-package cn.cps.springsecurity.springsecurity.security;
+package cn.cps.springsecurity.springsecurity.security.handler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

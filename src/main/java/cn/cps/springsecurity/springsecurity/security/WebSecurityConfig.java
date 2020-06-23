@@ -1,5 +1,8 @@
 package cn.cps.springsecurity.springsecurity.security;
 
+import cn.cps.springsecurity.springsecurity.security.handler.CustomAuthenticationFailureHandler;
+import cn.cps.springsecurity.springsecurity.security.handler.CustomAuthenticationSuccessHandler;
+import cn.cps.springsecurity.springsecurity.security.handler.CustomLogoutSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +15,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
