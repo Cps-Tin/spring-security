@@ -47,7 +47,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             throw new BadCredentialsException("密码错误");
         }
 
-        return new UsernamePasswordAuthenticationToken(inputName, inputPassword, userDetails.getAuthorities());
+        return new UsernamePasswordAuthenticationToken(userDetails, inputPassword, userDetails.getAuthorities());
     }
 
     private boolean validateVerify(String inputVerify) {
