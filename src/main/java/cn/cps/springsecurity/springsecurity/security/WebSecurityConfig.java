@@ -42,6 +42,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private CustomAuthenticationProvider customAuthenticationProvider;
 
+    //认证成功
+    @Autowired
+    private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+
+    //认证失败
+    @Autowired
+    private CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
+
     /**
      * 注入自定义PermissionEvaluator
      */
@@ -80,28 +88,39 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 // 如果有允许匿名的url，填在下面
-                .antMatchers("/verifyCode").permitAll()
+                .antMatchers("/verifyCode","/login/invalid","/login").permitAll()
                 .anyRequest().authenticated()
-                .and()
+
                 // 设置登陆页
-                .formLogin().loginPage("/login")
-                // 设置登陆成功页
-                .defaultSuccessUrl("/").permitAll()
+                .and().formLogin().loginPage("/login")
+                // 登陆成功页
+                //.defaultSuccessUrl("/").permitAll() //现在准备用代码实现，改逻辑只能存在一个实例
+                .successHandler(customAuthenticationSuccessHandler)
                 // 登录失败Url
-                .failureUrl("/login/error")
+                //.failureUrl("/login/error") //现在准备用代码实现，改逻辑只能存在一个实例
+                .failureHandler(customAuthenticationFailureHandler)
+
                 // 自定义登陆用户名和密码参数，默认为username和password
-//                .usernameParameter("username")
-//                .passwordParameter("password")
+                // .usernameParameter("username")
+                // .passwordParameter("password")
+
                 // 指定authenticationDetailsSource
                 .authenticationDetailsSource(authenticationDetailsSource)
-                .and()
-                .logout().permitAll()
-                // 自动登录
+                .and().logout().permitAll()
+
+                //自动登录
                 .and().rememberMe()
-                .tokenRepository(persistentTokenRepository())
-                // 有效时间：单位s
+                //记住我 有效时间：单位s
                 .tokenValiditySeconds(60)
-                .userDetailsService(userDetailsService);
+                //从数据库中获取【记住我】的数据
+                .tokenRepository(persistentTokenRepository())
+
+                //用户认证处理实现类
+                .userDetailsService(userDetailsService)
+
+                //session 过期退出时 配置处理逻辑
+                .and().sessionManagement()
+                .invalidSessionUrl("/login/invalid");
 
         // 关闭CSRF跨域
         http.csrf().disable();

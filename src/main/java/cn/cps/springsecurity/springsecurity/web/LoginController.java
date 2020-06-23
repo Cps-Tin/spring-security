@@ -3,6 +3,7 @@ package cn.cps.springsecurity.springsecurity.web;
 import cn.cps.springsecurity.springsecurity.utils.VerifyCodeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.RememberMeAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -11,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -55,22 +57,31 @@ public class LoginController {
     }
 
 
+    @RequestMapping("/login/invalid")
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ResponseBody
+    public String invalid() {
+        return "Session 已过期，请重新登录";
+    }
+
+
     /**
+     * 现在已经使用实现类 实现该方法了
      * 处理登录失败异常信息
      * @param request
      * @param response
      */
-    @RequestMapping("/login/error")
-    public void loginError(HttpServletRequest request, HttpServletResponse response) {
-        response.setContentType("text/html;charset=utf-8");
-        AuthenticationException exception =
-                (AuthenticationException)request.getSession().getAttribute("SPRING_SECURITY_LAST_EXCEPTION");
-        try {
-            response.getWriter().write(exception.toString());
-        }catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//    @RequestMapping("/login/error")
+//    public void loginError(HttpServletRequest request, HttpServletResponse response) {
+//        response.setContentType("text/html;charset=utf-8");
+//        AuthenticationException exception =
+//                (AuthenticationException)request.getSession().getAttribute("SPRING_SECURITY_LAST_EXCEPTION");
+//        try {
+//            response.getWriter().write(exception.toString());
+//        }catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     /**
      * 区分是密码登录还是记住我
