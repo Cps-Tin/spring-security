@@ -10,6 +10,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
@@ -50,8 +52,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
 
+    //退出处理
+    @Autowired
+    private CustomLogoutSuccessHandler logoutSuccessHandler;
+
+
+    @Bean
+    public SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
+    }
+
+
     /**
      * 注入自定义PermissionEvaluator
+     * 配置权限
      */
     @Bean
     public DefaultWebSecurityExpressionHandler webSecurityExpressionHandler(){
@@ -106,7 +120,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 // 指定authenticationDetailsSource
                 .authenticationDetailsSource(authenticationDetailsSource)
-                .and().logout().permitAll()
+                .and().logout()
+                //默认的退出 Url 是【/logout】，我们可以修改默认的退出 Url
+                .logoutUrl("/signout")
+                //退出时清除浏览器的 Cookie
+                .deleteCookies("JSESSIONID")
+                //退出后处理的逻辑
+                .logoutSuccessHandler(logoutSuccessHandler).permitAll()
 
                 //自动登录
                 .and().rememberMe()
@@ -120,7 +140,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 //session 过期退出时 配置处理逻辑
                 .and().sessionManagement()
-                .invalidSessionUrl("/login/invalid");
+                .invalidSessionUrl("/login/invalid")
+
+                //最大登录数
+                .maximumSessions(1)
+                //当达到最大值时，是否保留已经登录的用户 是否保留已经登录的用户；为true，新用户无法登录；为 false，旧用户被踢出
+                .maxSessionsPreventsLogin(false)
+                //当达到最大值时，旧用户被踢出后的操作
+                .expiredSessionStrategy(new CustomExpiredSessionStrategy())
+                //踢出用户逻辑处理
+                .sessionRegistry(sessionRegistry());
 
         // 关闭CSRF跨域
         http.csrf().disable();
