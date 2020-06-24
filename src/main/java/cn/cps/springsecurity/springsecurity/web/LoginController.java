@@ -8,11 +8,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.RememberMeAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,29 +49,73 @@ public class LoginController {
     }
 
 
-    @RequestMapping("/admin")
     @ResponseBody
+    @RequestMapping("/admin/r")
     @PreAuthorize("hasPermission('/admin','r')")
     public String printAdminR() {
         return "如果你看见这句话，说明你访问/admin路径具有r权限";
     }
 
 
-    @RequestMapping("/admin/c")
     @ResponseBody
+    @RequestMapping("/admin/c")
     @PreAuthorize("hasPermission('/admin','c')")
     public String printAdminC() {
         return "如果你看见这句话，说明你访问/admin路径具有c权限";
     }
 
 
+    @ResponseBody
     @RequestMapping("/login/invalid")
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ResponseBody
     public String invalid() {
         return "Session 已过期，请重新登录";
     }
 
+    /**
+     * 获取登录信息
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/me1")
+    public Object me1(){
+        return SecurityContextHolder.getContext().getAuthentication();
+    }
+
+    /**
+     * 获取登录信息
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/me2")
+    public Object me2(Authentication authentication){
+        return authentication;
+    }
+
+    /**
+     * 获取登录信息
+     * @return
+     */
+    @GetMapping("/me3")
+    @ResponseBody
+    public Object me3(@AuthenticationPrincipal UserDetails userDetails) {
+        return userDetails;
+    }
+
+
+    /**
+     * 区分是密码登录还是记住我
+     * @return
+     */
+    @RequestMapping("/isRemembermeUser")
+    public boolean isRemembermeUser(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication==null){
+            return false;
+        }
+        //判断当前用户是否是通过rememberme登录，是返回true,否返回false
+        return RememberMeAuthenticationToken.class.isAssignableFrom(authentication.getClass());
+    }
 
     /**
      * 踢出用户
@@ -104,6 +149,22 @@ public class LoginController {
         return "操作成功，清理session共" + count + "个";
     }
 
+    /**
+     * 生成前端的图片验证码
+     */
+    @RequestMapping(value = "/verifyCode")
+    public void verifyCode(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        int width = 120;//宽
+        int height = 40;//高
+        int verifySize = 4;//验证码个数
+
+        //生成随机字串
+        String verifyCode = VerifyCodeUtils.generateVerifyCode(verifySize);
+        //存入会话session
+        request.getSession().setAttribute(VerifyCodeUtils.VERIFY_CODE, verifyCode.toLowerCase());
+        //生成图片
+        VerifyCodeUtils.outputImage(width, height, response.getOutputStream(), verifyCode);
+    }
 
     /**
      * 现在已经使用实现类 实现该方法了
@@ -122,36 +183,5 @@ public class LoginController {
 //            e.printStackTrace();
 //        }
 //    }
-
-    /**
-     * 区分是密码登录还是记住我
-     * @return
-     */
-    @RequestMapping("/isRemembermeUser")
-    public boolean isRemembermeUser(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(authentication==null){
-            return false;
-        }
-        //判断当前用户是否是通过rememberme登录，是返回true,否返回false
-        return RememberMeAuthenticationToken.class.isAssignableFrom(authentication.getClass());
-    }
-
-    /**
-     * 生成前端的图片验证码
-     */
-    @RequestMapping(value = "/verifyCode")
-    public void verifyCode(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        int width = 120;//宽
-        int height = 40;//高
-        int verifySize = 4;//验证码个数
-
-        //生成随机字串
-        String verifyCode = VerifyCodeUtils.generateVerifyCode(verifySize);
-        //存入会话session
-        request.getSession().setAttribute(VerifyCodeUtils.VERIFY_CODE, verifyCode.toLowerCase());
-        //生成图片
-        VerifyCodeUtils.outputImage(width, height, response.getOutputStream(), verifyCode);
-    }
 
 }
