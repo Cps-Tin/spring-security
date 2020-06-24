@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -26,8 +27,8 @@ import javax.servlet.http.HttpServletRequest;
 @Component
 public class CustomAuthenticationProvider implements AuthenticationProvider {
 
-    @Autowired
-    private UserDetailsService userDetailsService;
+    @Resource
+    private CustomUserDetailsService customUserDetailsService;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -43,7 +44,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         }
 
         // userDetails为数据库中查询到的用户信息
-        UserDetails userDetails = userDetailsService.loadUserByUsername(inputName);
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(inputName);
 
         // 如果是自定义AuthenticationProvider，需要手动密码校验
         if(!userDetails.getPassword().equals(inputPassword)) {

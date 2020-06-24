@@ -1,4 +1,4 @@
-package cn.cps.springsecurity.springsecurity.security;
+package cn.cps.springsecurity.springsecurity.security.sms;
 
 import cn.cps.springsecurity.springsecurity.entity.SysRole;
 import cn.cps.springsecurity.springsecurity.entity.SysUser;
@@ -22,10 +22,10 @@ import java.util.List;
 /**
  * @Author: Cai Peishen
  * @Date: 2020/6/12 11:08
- * @Description: 图形登录认证处理
+ * @Description: 短信登录认证处理
  */
 @Service
-public class CustomUserDetailsService implements UserDetailsService {
+public class SmsMobileUserDetailsService implements UserDetailsService {
 
     @Autowired
     private SysUserService userService;
@@ -37,10 +37,10 @@ public class CustomUserDetailsService implements UserDetailsService {
     private SysUserRoleService userRoleService;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String mobile) throws UsernameNotFoundException {
         Collection<GrantedAuthority> authorities = new ArrayList<>();
         // 从数据库中取出用户信息
-        SysUser user = userService.selectByName(username);
+        SysUser user = userService.selectByMobile(mobile);
 
         // 判断用户是否存在
         if(user == null) {
@@ -55,7 +55,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
 
         // 返回UserDetails实现类
-        return new User(user.getName(), user.getPassword(), authorities);
+        return new User(user.getMobile(), user.getPassword(), authorities);
     }
 
 

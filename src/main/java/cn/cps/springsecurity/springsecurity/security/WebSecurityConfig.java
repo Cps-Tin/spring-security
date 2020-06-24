@@ -22,6 +22,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
@@ -35,8 +36,8 @@ import javax.sql.DataSource;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private UserDetailsService userDetailsService;
+    @Resource
+    private CustomUserDetailsService customUserDetailsService;
 
     @Autowired
     private DataSource dataSource;
@@ -71,9 +72,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private SmsCodeAuthenticationSecurityConfig smsCodeAuthenticationSecurityConfig;
 
-    //图形验证配置中心
-    //@Autowired
-    //private CustomAuthenticationSecurityConfig customAuthenticationSecurityConfig;
 
     /**
      * 注入自定义PermissionEvaluator
@@ -113,8 +111,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .apply(smsCodeAuthenticationSecurityConfig).and()
-                .authorizeRequests()
+                //验证码登录配置中心(以下关于认证逻辑需要重新配置)
+                .apply(smsCodeAuthenticationSecurityConfig)
+                //授权请求
+                .and().authorizeRequests()
                 // 如果有允许匿名的url，填在下面
                 .antMatchers("/verifyCode","/login/invalid","/login","/sms/**").permitAll()
                 .anyRequest().authenticated()
@@ -150,7 +150,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .tokenRepository(persistentTokenRepository())
 
                 //用户认证处理实现类
-                .userDetailsService(userDetailsService)
+                .userDetailsService(customUserDetailsService)
 
                 //session过期时 配置处理逻辑
                 .and().sessionManagement()

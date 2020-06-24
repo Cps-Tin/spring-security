@@ -20,7 +20,7 @@ import java.util.Map;
  */
 public class SmsCodeAuthenticationProvider implements AuthenticationProvider {
 
-    private UserDetailsService userDetailsService;
+    private SmsMobileUserDetailsService smsMobileUserDetailsService;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -30,7 +30,7 @@ public class SmsCodeAuthenticationProvider implements AuthenticationProvider {
 
         checkSmsCode(mobile);
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(mobile);
+        UserDetails userDetails = smsMobileUserDetailsService.loadUserByUsername(mobile);
 
         // 此时鉴权成功后，应当重新 new 一个拥有鉴权的 authenticationResult 返回
         SmsCodeAuthenticationToken authenticationResult = new SmsCodeAuthenticationToken(userDetails, userDetails.getAuthorities());
@@ -66,11 +66,11 @@ public class SmsCodeAuthenticationProvider implements AuthenticationProvider {
         return SmsCodeAuthenticationToken.class.isAssignableFrom(authentication);
     }
 
-    public UserDetailsService getUserDetailsService() {
-        return userDetailsService;
+    public SmsMobileUserDetailsService getSmsMobileUserDetailsService() {
+        return smsMobileUserDetailsService;
     }
 
-    public void setUserDetailsService(UserDetailsService userDetailsService) {
-        this.userDetailsService = userDetailsService;
+    public void setSmsMobileUserDetailsService(SmsMobileUserDetailsService smsMobileUserDetailsService) {
+        this.smsMobileUserDetailsService = smsMobileUserDetailsService;
     }
 }
