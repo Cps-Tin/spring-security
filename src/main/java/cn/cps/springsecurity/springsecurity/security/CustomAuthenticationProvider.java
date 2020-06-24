@@ -55,12 +55,11 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         // 不分区大小写
         // 这个verifyCode是在servlet中存入session的名字
-        String verifyCode = ((String) request.getSession().getAttribute(VerifyCodeUtils.VERIFY_CODE)).toLowerCase();
-        inputVerify = inputVerify.toLowerCase();
+        String verifyCode = ((String) request.getSession().getAttribute(VerifyCodeUtils.VERIFY_CODE));
 
         System.out.println("验证码：" + verifyCode + "用户输入：" + inputVerify);
 
-        return verifyCode.equals(inputVerify);
+        return verifyCode.equalsIgnoreCase(inputVerify);
     }
 
     @Override
