@@ -26,6 +26,7 @@ import java.util.List;
  */
 @Service("userDetailsService")
 public class CustomUserDetailsService implements UserDetailsService {
+
     @Autowired
     private SysUserService userService;
 
@@ -56,5 +57,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         // 返回UserDetails实现类
         return new User(user.getName(), user.getPassword(), authorities);
     }
+
+
 }
 

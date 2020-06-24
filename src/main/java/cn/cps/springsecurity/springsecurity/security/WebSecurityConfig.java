@@ -3,6 +3,7 @@ package cn.cps.springsecurity.springsecurity.security;
 import cn.cps.springsecurity.springsecurity.security.handler.CustomAuthenticationFailureHandler;
 import cn.cps.springsecurity.springsecurity.security.handler.CustomAuthenticationSuccessHandler;
 import cn.cps.springsecurity.springsecurity.security.handler.CustomLogoutSuccessHandler;
+import cn.cps.springsecurity.springsecurity.security.sms.SmsCodeAuthenticationSecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +16,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
@@ -32,8 +34,9 @@ import javax.sql.DataSource;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
     @Autowired
-    private CustomUserDetailsService userDetailsService;
+    private UserDetailsService userDetailsService;
 
     @Autowired
     private DataSource dataSource;
@@ -58,12 +61,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private CustomLogoutSuccessHandler logoutSuccessHandler;
 
-
+    //Session超时处理
     @Bean
     public SessionRegistry sessionRegistry() {
         return new SessionRegistryImpl();
     }
 
+    //短信验证中心配置
+    @Autowired
+    private SmsCodeAuthenticationSecurityConfig smsCodeAuthenticationSecurityConfig;
+
+    //图形验证配置中心
+    //@Autowired
+    //private CustomAuthenticationSecurityConfig customAuthenticationSecurityConfig;
 
     /**
      * 注入自定义PermissionEvaluator
@@ -102,18 +112,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
+        http
+                .apply(smsCodeAuthenticationSecurityConfig).and()
+                .authorizeRequests()
                 // 如果有允许匿名的url，填在下面
-                .antMatchers("/verifyCode","/login/invalid","/login").permitAll()
+                .antMatchers("/verifyCode","/login/invalid","/login","/sms/**").permitAll()
                 .anyRequest().authenticated()
 
                 // 设置登陆页
                 .and().formLogin().loginPage("/login")
                 // 登陆成功页
-                //.defaultSuccessUrl("/").permitAll() //现在准备用代码实现，改逻辑只能存在一个实例
+                //.defaultSuccessUrl("/").permitAll() //现在用代码实现处理逻辑
                 .successHandler(customAuthenticationSuccessHandler)
                 // 登录失败Url
-                //.failureUrl("/login/error") //现在准备用代码实现，改逻辑只能存在一个实例
+                //.failureUrl("/login/error") //现在用代码实现处理逻辑
                 .failureHandler(customAuthenticationFailureHandler)
 
                 // 自定义登陆用户名和密码参数，默认为username和password
@@ -140,7 +152,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 //用户认证处理实现类
                 .userDetailsService(userDetailsService)
 
-                //session 过期退出时 配置处理逻辑
+                //session过期时 配置处理逻辑
                 .and().sessionManagement()
                 .invalidSessionUrl("/login/invalid")
 

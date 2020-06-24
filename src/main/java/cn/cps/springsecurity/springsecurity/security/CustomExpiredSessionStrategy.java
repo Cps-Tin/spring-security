@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * @Author: Cai Peishen
  * @Date: 2020/6/23 17:02
- * @Description: session过期处理
+ * @Description: 来处理旧用户登陆失败的逻辑
  */
 public class CustomExpiredSessionStrategy implements SessionInformationExpiredStrategy {
 

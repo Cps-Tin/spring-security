@@ -19,8 +19,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: Cai Peishen
@@ -65,12 +68,36 @@ public class LoginController {
     }
 
 
+    /**
+     * Session过期逻辑处理
+     * @return
+     */
     @ResponseBody
     @RequestMapping("/login/invalid")
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public String invalid() {
         return "Session 已过期，请重新登录";
     }
+
+    /**
+     * 获取手机验证码
+     * @param mobile
+     * @param session
+     */
+    @ResponseBody
+    @RequestMapping("/sms/code")
+    public void sms(String mobile, HttpSession session) {
+        int code = (int) Math.ceil(Math.random() * 9000 + 1000);
+
+        Map<String, Object> map = new HashMap<>(16);
+        map.put("mobile", mobile);
+        map.put("code", code);
+
+        session.setAttribute("smsCode", map);
+
+        logger.info("{}：为 {} 设置短信验证码：{}", session.getId(), mobile, code);
+    }
+
 
     /**
      * 获取登录信息

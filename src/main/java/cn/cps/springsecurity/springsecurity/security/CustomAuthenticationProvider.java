@@ -1,6 +1,7 @@
 package cn.cps.springsecurity.springsecurity.security;
 
 import cn.cps.springsecurity.springsecurity.utils.VerifyCodeUtils;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -9,6 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -23,8 +25,9 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Component
 public class CustomAuthenticationProvider implements AuthenticationProvider {
+
     @Autowired
-    private CustomUserDetailsService customUserDetailsService;
+    private UserDetailsService userDetailsService;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -40,7 +43,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         }
 
         // userDetails为数据库中查询到的用户信息
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername(inputName);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(inputName);
 
         // 如果是自定义AuthenticationProvider，需要手动密码校验
         if(!userDetails.getPassword().equals(inputPassword)) {

@@ -24,4 +24,6 @@ public class SysUser implements Serializable {
 
     private String password;
 
+    private String mobile;
+
 }

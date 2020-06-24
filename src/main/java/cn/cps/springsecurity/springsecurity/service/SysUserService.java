@@ -25,4 +25,7 @@ public class SysUserService {
         return userMapper.selectByName(name);
     }
 
+    public SysUser selectByMobile(String mobile) {
+        return userMapper.selectByMobile(mobile);
+    }
 }
