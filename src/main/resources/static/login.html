@@ -6,7 +6,7 @@
 </head>
 <body>
 <h1>登陆</h1>
-<form method="post" action="/login">
+<form method="post" action="form/login">
     <div>
         用户名：<input type="text" name="username">
     </div>
@@ -14,7 +14,7 @@
         密码：<input type="password" name="password">
     </div>
     <div>
-        <img src="verifyCode" title="看不清，请点我" onclick="refresh(this)" onmouseover="mouseover(this)" />
+        <img src="getVerifyCode" title="看不清，请点我" onclick="refresh(this)" onmouseover="mouseover(this)" />
         <br/>
         <input type="text" class="form-control" name="verifyCode" required="required" placeholder="验证码">
     </div>
@@ -26,7 +26,7 @@
 <br>
 <form method="post" action="/sms/login">
     <div>
-        手机号：<input type="text" id="mobile" name="mobile" value="admin">
+        手机号：<input type="text" id="smsMobile" name="smsMobile" value="admin">
     </div>
     <div>
         验证码：<input type="text" name="smsCode">
@@ -39,7 +39,7 @@
 
 <script>
     function sendSms() {
-        window.location.href = '/sms/code?mobile=' + document.getElementById("mobile").value;
+        window.location.href = '/getSmsCode?mobile=' + document.getElementById("smsMobile").value;
     }
 </script>
 </body>

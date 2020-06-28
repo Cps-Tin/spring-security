@@ -25,7 +25,7 @@ import java.util.List;
  * @Description: 短信登录认证处理
  */
 @Service
-public class SmsMobileUserDetailsService implements UserDetailsService {
+public class SmsCodeUserDetailsService implements UserDetailsService {
 
     @Autowired
     private SysUserService userService;
@@ -44,7 +44,7 @@ public class SmsMobileUserDetailsService implements UserDetailsService {
 
         // 判断用户是否存在
         if(user == null) {
-            throw new UsernameNotFoundException("用户名不存在");
+            throw new UsernameNotFoundException("该手机号不存在");
         }
 
         // 添加权限

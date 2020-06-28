@@ -1,5 +1,6 @@
 package cn.cps.springsecurity.springsecurity.web;
 
+import cn.cps.springsecurity.springsecurity.security.SecurityConstants;
 import cn.cps.springsecurity.springsecurity.utils.VerifyCodeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +39,7 @@ public class LoginController {
     @Autowired
     private SessionRegistry sessionRegistry;
 
-    @RequestMapping("/")
+    @RequestMapping("/home")
     public String showHome() {
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
         logger.info("当前登陆用户：" + name);
@@ -46,7 +47,8 @@ public class LoginController {
         return "home.html";
     }
 
-    @RequestMapping("/login")
+    //进入登录页
+    @RequestMapping(SecurityConstants.LOGIN_URL)
     public String showLogin() {
         return "login.html";
     }
@@ -73,7 +75,7 @@ public class LoginController {
      * @return
      */
     @ResponseBody
-    @RequestMapping("/login/invalid")
+    @RequestMapping(SecurityConstants.INVALID_SESSION_URL)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public String invalid() {
         return "Session 已过期，请重新登录";
@@ -85,15 +87,16 @@ public class LoginController {
      * @param session
      */
     @ResponseBody
-    @RequestMapping("/sms/code")
+    @RequestMapping(SecurityConstants.SMS_CODE_URL)
     public void sms(String mobile, HttpSession session) {
         int code = (int) Math.ceil(Math.random() * 9000 + 1000);
 
+        //map在实战中会使用Reids代替
         Map<String, Object> map = new HashMap<>(16);
         map.put("mobile", mobile);
         map.put("code", code);
 
-        session.setAttribute("smsCode", map);
+        session.setAttribute("smsCodeSession", map);
 
         logger.info("{}：为 {} 设置短信验证码：{}", session.getId(), mobile, code);
     }
@@ -179,7 +182,7 @@ public class LoginController {
     /**
      * 生成前端的图片验证码
      */
-    @RequestMapping(value = "/verifyCode")
+    @RequestMapping(SecurityConstants.VERIFY_CODE_URL)
     public void verifyCode(HttpServletRequest request, HttpServletResponse response) throws IOException {
         int width = 120;//宽
         int height = 40;//高
@@ -188,7 +191,7 @@ public class LoginController {
         //生成随机字串
         String verifyCode = VerifyCodeUtils.generateVerifyCode(verifySize);
         //存入会话session
-        request.getSession().setAttribute(VerifyCodeUtils.VERIFY_CODE, verifyCode.toLowerCase());
+        request.getSession().setAttribute(VerifyCodeUtils.VERIFY_CODE_KEY, verifyCode);
         //生成图片
         VerifyCodeUtils.outputImage(width, height, response.getOutputStream(), verifyCode);
     }

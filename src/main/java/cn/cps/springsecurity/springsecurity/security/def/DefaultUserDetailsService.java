@@ -1,4 +1,4 @@
-package cn.cps.springsecurity.springsecurity.security;
+package cn.cps.springsecurity.springsecurity.security.def;
 
 import cn.cps.springsecurity.springsecurity.entity.SysRole;
 import cn.cps.springsecurity.springsecurity.entity.SysUser;
@@ -25,7 +25,7 @@ import java.util.List;
  * @Description: 图形登录认证处理
  */
 @Service
-public class CustomUserDetailsService implements UserDetailsService {
+public class DefaultUserDetailsService implements UserDetailsService {
 
     @Autowired
     private SysUserService userService;

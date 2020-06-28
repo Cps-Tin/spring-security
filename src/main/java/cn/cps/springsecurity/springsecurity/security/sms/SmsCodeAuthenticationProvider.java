@@ -1,12 +1,11 @@
 package cn.cps.springsecurity.springsecurity.security.sms;
 
-import lombok.Data;
+import cn.cps.springsecurity.springsecurity.security.SecurityConstants;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -20,7 +19,7 @@ import java.util.Map;
  */
 public class SmsCodeAuthenticationProvider implements AuthenticationProvider {
 
-    private SmsMobileUserDetailsService smsMobileUserDetailsService;
+    private SmsCodeUserDetailsService smsCodeUserDetailsService;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -30,7 +29,7 @@ public class SmsCodeAuthenticationProvider implements AuthenticationProvider {
 
         checkSmsCode(mobile);
 
-        UserDetails userDetails = smsMobileUserDetailsService.loadUserByUsername(mobile);
+        UserDetails userDetails = smsCodeUserDetailsService.loadUserByUsername(mobile);
 
         // 此时鉴权成功后，应当重新 new 一个拥有鉴权的 authenticationResult 返回
         SmsCodeAuthenticationToken authenticationResult = new SmsCodeAuthenticationToken(userDetails, userDetails.getAuthorities());
@@ -40,19 +39,21 @@ public class SmsCodeAuthenticationProvider implements AuthenticationProvider {
         return authenticationResult;
     }
 
-    private void checkSmsCode(String mobile) {
+    private void checkSmsCode(String smsMobile) {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        String inputCode = request.getParameter("smsCode");
+        String inputCode = request.getParameter(SecurityConstants.SMS_CODE_PARAMETER);
 
-        Map<String, Object> smsCode = (Map<String, Object>) request.getSession().getAttribute("smsCode");
-        if(smsCode == null) {
+        //map在实战中会被Redis代替 -> 所以这里参数并没有使用常量替换
+        Map<String, Object> map = (Map<String, Object>) request.getSession().getAttribute("smsCodeSession");
+        if(map == null) {
             throw new BadCredentialsException("未检测到申请验证码");
         }
 
-        String applyMobile = (String) smsCode.get("mobile");
-        int code = (int) smsCode.get("code");
+        String applyMobile = (String) map.get("mobile");
 
-        if(!applyMobile.equals(mobile)) {
+        int code = (int) map.get("code");
+
+        if(!applyMobile.equals(smsMobile)) {
             throw new BadCredentialsException("申请的手机号码与登录手机号码不一致");
         }
         if(code != Integer.parseInt(inputCode)) {
@@ -66,11 +67,11 @@ public class SmsCodeAuthenticationProvider implements AuthenticationProvider {
         return SmsCodeAuthenticationToken.class.isAssignableFrom(authentication);
     }
 
-    public SmsMobileUserDetailsService getSmsMobileUserDetailsService() {
-        return smsMobileUserDetailsService;
+    public SmsCodeUserDetailsService getSmsCodeUserDetailsService() {
+        return smsCodeUserDetailsService;
     }
 
-    public void setSmsMobileUserDetailsService(SmsMobileUserDetailsService smsMobileUserDetailsService) {
-        this.smsMobileUserDetailsService = smsMobileUserDetailsService;
+    public void setSmsCodeUserDetailsService(SmsCodeUserDetailsService smsCodeUserDetailsService) {
+        this.smsCodeUserDetailsService = smsCodeUserDetailsService;
     }
 }

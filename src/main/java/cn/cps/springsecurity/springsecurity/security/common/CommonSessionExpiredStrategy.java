@@ -1,4 +1,4 @@
-package cn.cps.springsecurity.springsecurity.security;
+package cn.cps.springsecurity.springsecurity.security.common;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.web.session.SessionInformationExpiredEvent;
@@ -12,9 +12,9 @@ import java.util.Map;
 /**
  * @Author: Cai Peishen
  * @Date: 2020/6/23 17:02
- * @Description: 来处理旧用户登陆失败的逻辑
+ * @Description: 来处理旧用户被顶下去的逻辑
  */
-public class CustomExpiredSessionStrategy implements SessionInformationExpiredStrategy {
+public class CommonSessionExpiredStrategy implements SessionInformationExpiredStrategy {
 
     private ObjectMapper objectMapper = new ObjectMapper();
 

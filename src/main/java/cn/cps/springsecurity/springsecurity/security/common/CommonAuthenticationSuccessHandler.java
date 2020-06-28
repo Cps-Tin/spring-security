@@ -1,5 +1,6 @@
-package cn.cps.springsecurity.springsecurity.security.handler;
+package cn.cps.springsecurity.springsecurity.security.common;
 
+import cn.cps.springsecurity.springsecurity.security.SecurityConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -17,14 +18,14 @@ import java.io.IOException;
  * @Description: 用来处理认证成功后逻辑
  */
 @Component
-public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
+public class CommonAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         logger.info("登录成功,{}", authentication);
-        response.sendRedirect("/");
+        response.sendRedirect(SecurityConstants.LOGIN_SUCCESS_URL);
     }
 
 }

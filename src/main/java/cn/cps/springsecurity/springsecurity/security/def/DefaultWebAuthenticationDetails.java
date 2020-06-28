@@ -1,5 +1,6 @@
-package cn.cps.springsecurity.springsecurity.security;
+package cn.cps.springsecurity.springsecurity.security.def;
 
+import cn.cps.springsecurity.springsecurity.security.SecurityConstants;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 
 import javax.servlet.http.HttpServletRequest;
@@ -9,15 +10,14 @@ import javax.servlet.http.HttpServletRequest;
  * @Date: 2020/6/12 16:36
  * @Description: 获取用户登录时携带的额外信息
  */
-public class CustomWebAuthenticationDetails extends WebAuthenticationDetails {
+public class DefaultWebAuthenticationDetails extends WebAuthenticationDetails {
 
-    private static final long serialVersionUID = 6975601077710753878L;
     private final String verifyCode;
 
-    public CustomWebAuthenticationDetails(HttpServletRequest request) {
+    public DefaultWebAuthenticationDetails(HttpServletRequest request) {
         super(request);
         // verifyCode为页面中验证码的name
-        verifyCode = request.getParameter("verifyCode");
+        verifyCode = request.getParameter(SecurityConstants.VERIFY_CODE_PARAMETER);
     }
 
     public String getVerifyCode() {

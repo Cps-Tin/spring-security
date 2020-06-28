@@ -1,6 +1,7 @@
-package cn.cps.springsecurity.springsecurity.security.handler;
+package cn.cps.springsecurity.springsecurity.security.common;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,7 @@ import java.io.IOException;
  * @Description: 用来处理认证失败后逻辑
  */
 @Component
-public class CustomAuthenticationFailureHandler implements AuthenticationFailureHandler{
+public class CommonAuthenticationFailureHandler implements AuthenticationFailureHandler{
 
     @Autowired
     private ObjectMapper objectMapper;

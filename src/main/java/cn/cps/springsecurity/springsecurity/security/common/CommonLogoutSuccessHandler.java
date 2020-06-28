@@ -1,5 +1,6 @@
-package cn.cps.springsecurity.springsecurity.security.handler;
+package cn.cps.springsecurity.springsecurity.security.common;
 
+import cn.cps.springsecurity.springsecurity.security.SecurityConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -18,7 +19,7 @@ import java.io.IOException;
  * @Description: 退出登录
  */
 @Component
-public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
+public class CommonLogoutSuccessHandler implements LogoutSuccessHandler {
 
     Logger log = LoggerFactory.getLogger(getClass());
 
@@ -28,7 +29,7 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
         log.info("退出成功，用户名：{}", username);
 
         // 重定向到登录页
-        response.sendRedirect("/login");
+        response.sendRedirect(SecurityConstants.LOGIN_URL);
     }
 
 }

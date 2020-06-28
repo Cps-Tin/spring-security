@@ -1,12 +1,11 @@
 package cn.cps.springsecurity.springsecurity.security.sms;
 
-import cn.cps.springsecurity.springsecurity.security.handler.CustomAuthenticationFailureHandler;
-import cn.cps.springsecurity.springsecurity.security.handler.CustomAuthenticationSuccessHandler;
+import cn.cps.springsecurity.springsecurity.security.common.CommonAuthenticationFailureHandler;
+import cn.cps.springsecurity.springsecurity.security.common.CommonAuthenticationSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Component;
@@ -23,23 +22,23 @@ public class SmsCodeAuthenticationSecurityConfig extends SecurityConfigurerAdapt
 
     //这里注入的验证码userDetailsService
     @Resource
-    private SmsMobileUserDetailsService smsMobileUserDetailsService;
+    private SmsCodeUserDetailsService smsCodeUserDetailsService;
 
     @Autowired
-    private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+    private CommonAuthenticationSuccessHandler commonAuthenticationSuccessHandler;
     @Autowired
-    private CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
+    private CommonAuthenticationFailureHandler commonAuthenticationFailureHandler;
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
         SmsCodeAuthenticationFilter smsCodeAuthenticationFilter = new SmsCodeAuthenticationFilter();
         smsCodeAuthenticationFilter.setAuthenticationManager(http.getSharedObject(AuthenticationManager.class));
         //自定义了登录配置，登录成功失败也需要重新指定
-        smsCodeAuthenticationFilter.setAuthenticationSuccessHandler(customAuthenticationSuccessHandler);
-        smsCodeAuthenticationFilter.setAuthenticationFailureHandler(customAuthenticationFailureHandler);
+        smsCodeAuthenticationFilter.setAuthenticationSuccessHandler(commonAuthenticationSuccessHandler);
+        smsCodeAuthenticationFilter.setAuthenticationFailureHandler(commonAuthenticationFailureHandler);
 
         SmsCodeAuthenticationProvider smsCodeAuthenticationProvider = new SmsCodeAuthenticationProvider();
-        smsCodeAuthenticationProvider.setSmsMobileUserDetailsService(smsMobileUserDetailsService);
+        smsCodeAuthenticationProvider.setSmsCodeUserDetailsService(smsCodeUserDetailsService);
 
         http.authenticationProvider(smsCodeAuthenticationProvider)
                 .addFilterAfter(smsCodeAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

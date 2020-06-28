@@ -1,8 +1,6 @@
-package cn.cps.springsecurity.springsecurity.security;
+package cn.cps.springsecurity.springsecurity.security.def;
 
 import cn.cps.springsecurity.springsecurity.utils.VerifyCodeUtils;
-import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -10,7 +8,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -25,10 +22,10 @@ import javax.servlet.http.HttpServletRequest;
  * 这里需要我们自定义AuthenticationProvider，需要注意的是，如果是我们自己实现AuthenticationProvider，那么我们就需要自己做密码校验了。
  */
 @Component
-public class CustomAuthenticationProvider implements AuthenticationProvider {
+public class DefaultAuthenticationProvider implements AuthenticationProvider {
 
     @Resource
-    private CustomUserDetailsService customUserDetailsService;
+    private DefaultUserDetailsService defaultUserDetailsService;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -36,7 +33,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         String inputName = authentication.getName();
         String inputPassword = authentication.getCredentials().toString();
 
-        CustomWebAuthenticationDetails details = (CustomWebAuthenticationDetails) authentication.getDetails();
+        DefaultWebAuthenticationDetails details = (DefaultWebAuthenticationDetails) authentication.getDetails();
 
         String verifyCode = details.getVerifyCode();
         if(!validateVerify(verifyCode)) {
@@ -44,7 +41,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         }
 
         // userDetails为数据库中查询到的用户信息
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername(inputName);
+        UserDetails userDetails = defaultUserDetailsService.loadUserByUsername(inputName);
 
         // 如果是自定义AuthenticationProvider，需要手动密码校验
         if(!userDetails.getPassword().equals(inputPassword)) {
@@ -59,9 +56,9 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         // 不分区大小写
         // 这个verifyCode是在servlet中存入session的名字
-        String verifyCode = ((String) request.getSession().getAttribute(VerifyCodeUtils.VERIFY_CODE));
+        String verifyCode = ((String) request.getSession().getAttribute(VerifyCodeUtils.VERIFY_CODE_KEY));
 
-        System.out.println("验证码：" + verifyCode + "用户输入：" + inputVerify);
+        System.out.println("图形验证码：" + verifyCode + "用户输入：" + inputVerify);
 
         return verifyCode.equalsIgnoreCase(inputVerify);
     }

@@ -1,4 +1,4 @@
-package cn.cps.springsecurity.springsecurity.security;
+package cn.cps.springsecurity.springsecurity.security.common;
 
 import cn.cps.springsecurity.springsecurity.entity.SysPermission;
 import cn.cps.springsecurity.springsecurity.service.SysPermissionService;
@@ -21,7 +21,7 @@ import java.util.List;
  * @Description: 处理权限
  */
 @Component
-public class CustomPermissionEvaluator implements PermissionEvaluator {
+public class CommonPermissionEvaluator implements PermissionEvaluator {
 
     @Autowired
     private SysPermissionService permissionService;

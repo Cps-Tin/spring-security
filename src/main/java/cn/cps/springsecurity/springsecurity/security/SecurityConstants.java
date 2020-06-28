@@ -7,56 +7,50 @@ package cn.cps.springsecurity.springsecurity.security;
  * @Description: 相关常量
  */
 public class SecurityConstants {
-    /**
-     * 当没有权限时，被引导跳转的 Url
-     */
-    public static final String UN_AUTHENTICATION_URL = "/sso";
-    /**
-     * 退出登录的 Url
-     */
+
+    //当没有权限时，被引导跳转的 Url
+    public static final String LOGIN_URL = "/login";
+
+    //退出登录的 Url
     public static final String LOGOUT_URL = "/logout";
-    /**
-     * 登陆成功后，被引导跳转的 Url
-     */
-    public static final String LOGIN_SUCCESS_URL = "/";
-    /**
-     * Session 过期被引导跳转的 Url
-     */
+
+    //登陆成功后，被引导跳转的 Url
+    public static final String LOGIN_SUCCESS_URL = "/home";
+
+    //Session 过期被引导跳转的 Url
     public static final String INVALID_SESSION_URL = "/login/invalid";
 
-    /**
-     * 用户名密码登录请求处理url
-     */
-    public static final String LOGIN_PROCESSING_URL_FORM = "/form/login";
-    /**
-     * 手机验证码登录请求处理url
-     */
-    public static final String LOGIN_PROCESSING_URL_MOBILE = "/sms/login";
+    //用户名密码登录请求处理url
+    public static final String LOGIN_URL_FORM = "/form/login";
 
-    /**
-     * 手机验证码登录手机号表单字段名
-     */
-    public static final String LOGIN_MOBILE_PARAMETER = "mobile";
-    /**
-     * 手机验证码登录验证码表单字段名
-     */
-    public static final String LOGIN_MOBILE_CODE_PARAMETER = "smsCode";
-    /**
-     * 验证码登陆表单字段名
-     */
-    public static final String VALIDATE_CODE_PARAMETER = "verifyCode";
+    //手机验证码登录请求处理url
+    public static final String LOGIN_URL_MOBILE = "/sms/login";
 
-    /**
-     * 验证码相关 Url 前缀
-     * 包括图形验证码图片、短信验证码接口等等...
+
+    /*
+     * 图形验证登录
      */
-    public static final String VALIDATE_CODE_URL_PREFIX = "/code";
-    /**
-     * 图形验证码 Url
+
+    //验证码登陆表单字段名
+    public static final String VERIFY_CODE_PARAMETER = "verifyCode";
+
+    //获取图形验证码Url 包括图形验证码图片
+    public static final String VERIFY_CODE_URL = "/getVerifyCode";
+
+
+    /*
+     * 手机验证码登录
      */
-    public static final String VALIDATE_CODE_PIC_URL = VALIDATE_CODE_URL_PREFIX + "/getVerifyCode";
-    /**
-     * 验证码错误 Url
-     */
-    public static final String VALIDATE_CODE_ERR_URL = VALIDATE_CODE_URL_PREFIX + "/error";
+
+    //手机验证码登录手机号表单字段名
+    public static final String SMS_MOBILE_PARAMETER = "smsMobile";
+
+    //手机验证码登录手机验证码表单字段名
+    public static final String SMS_CODE_PARAMETER = "smsCode";
+
+    //获取短信验证码Url 包括短信验证码接口等等...
+    public static final String SMS_CODE_URL = "/getSmsCode";
+
+
+
 }

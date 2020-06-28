@@ -1,8 +1,8 @@
 package cn.cps.springsecurity.springsecurity.security;
 
-import cn.cps.springsecurity.springsecurity.security.handler.CustomAuthenticationFailureHandler;
-import cn.cps.springsecurity.springsecurity.security.handler.CustomAuthenticationSuccessHandler;
-import cn.cps.springsecurity.springsecurity.security.handler.CustomLogoutSuccessHandler;
+import cn.cps.springsecurity.springsecurity.security.common.*;
+import cn.cps.springsecurity.springsecurity.security.def.DefaultAuthenticationProvider;
+import cn.cps.springsecurity.springsecurity.security.def.DefaultUserDetailsService;
 import cn.cps.springsecurity.springsecurity.security.sms.SmsCodeAuthenticationSecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -16,7 +16,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
@@ -37,30 +36,30 @@ import javax.sql.DataSource;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Resource
-    private CustomUserDetailsService customUserDetailsService;
+    private DefaultUserDetailsService defaultUserDetailsService;
 
     @Autowired
     private DataSource dataSource;
 
-    //请求配置
+    //请求配置(记住我)
     @Autowired
-    private AuthenticationDetailsSource<HttpServletRequest, WebAuthenticationDetails> authenticationDetailsSource;
+    private AuthenticationDetailsSource<HttpServletRequest, WebAuthenticationDetails> detailsAuthenticationDetailsSource;
 
     //自定义校验
     @Autowired
-    private CustomAuthenticationProvider customAuthenticationProvider;
+    private DefaultAuthenticationProvider defaultAuthenticationProvider;
 
     //认证成功
     @Autowired
-    private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+    private CommonAuthenticationSuccessHandler commonAuthenticationSuccessHandler;
 
     //认证失败
     @Autowired
-    private CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
+    private CommonAuthenticationFailureHandler commonAuthenticationFailureHandler;
 
     //退出处理
     @Autowired
-    private CustomLogoutSuccessHandler logoutSuccessHandler;
+    private CommonLogoutSuccessHandler commonLogoutSuccessHandler;
 
     //Session超时处理
     @Bean
@@ -80,7 +79,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public DefaultWebSecurityExpressionHandler webSecurityExpressionHandler(){
         DefaultWebSecurityExpressionHandler handler = new DefaultWebSecurityExpressionHandler();
-        handler.setPermissionEvaluator(new CustomPermissionEvaluator());
+        handler.setPermissionEvaluator(new CommonPermissionEvaluator());
         return handler;
     }
 
@@ -92,7 +91,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         //使用自定义密码校验
-        auth.authenticationProvider(customAuthenticationProvider);
+        auth.authenticationProvider(defaultAuthenticationProvider);
 
         //密码校验(不加密)
 //        auth.userDetailsService(userDetailsService).passwordEncoder(new PasswordEncoder() {
@@ -116,31 +115,44 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 //授权请求
                 .and().authorizeRequests()
                 // 如果有允许匿名的url，填在下面
-                .antMatchers("/verifyCode","/login/invalid","/login","/sms/**").permitAll()
+                .antMatchers(
+                        //登录页
+                        SecurityConstants.LOGIN_URL,
+                        //登录Url
+                        SecurityConstants.LOGIN_URL_FORM,
+                        //获取图形验证码
+                        SecurityConstants.VERIFY_CODE_URL,
+                        //获取短信验证码
+                        SecurityConstants.SMS_CODE_URL,
+                        //Session过期跳转
+                        SecurityConstants.INVALID_SESSION_URL
+                ).permitAll()
                 .anyRequest().authenticated()
 
                 // 设置登陆页
-                .and().formLogin().loginPage("/login")
+                .and().formLogin().loginPage(SecurityConstants.LOGIN_URL)
+                // 配置登录处理URL
+                .loginProcessingUrl(SecurityConstants.LOGIN_URL_FORM)
                 // 登陆成功页
                 //.defaultSuccessUrl("/").permitAll() //现在用代码实现处理逻辑
-                .successHandler(customAuthenticationSuccessHandler)
+                .successHandler(commonAuthenticationSuccessHandler)
                 // 登录失败Url
                 //.failureUrl("/login/error") //现在用代码实现处理逻辑
-                .failureHandler(customAuthenticationFailureHandler)
+                .failureHandler(commonAuthenticationFailureHandler)
 
                 // 自定义登陆用户名和密码参数，默认为username和password
                 // .usernameParameter("username")
                 // .passwordParameter("password")
 
                 // 指定authenticationDetailsSource
-                .authenticationDetailsSource(authenticationDetailsSource)
+                .authenticationDetailsSource(detailsAuthenticationDetailsSource)
                 .and().logout()
                 //默认的退出 Url 是【/logout】，我们可以修改默认的退出 Url
-                .logoutUrl("/signout")
+                .logoutUrl(SecurityConstants.LOGOUT_URL)
                 //退出时清除浏览器的 Cookie
                 .deleteCookies("JSESSIONID")
                 //退出后处理的逻辑
-                .logoutSuccessHandler(logoutSuccessHandler).permitAll()
+                .logoutSuccessHandler(commonLogoutSuccessHandler).permitAll()
 
                 //自动登录
                 .and().rememberMe()
@@ -150,18 +162,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .tokenRepository(persistentTokenRepository())
 
                 //用户认证处理实现类
-                .userDetailsService(customUserDetailsService)
+                .userDetailsService(defaultUserDetailsService)
 
                 //session过期时 配置处理逻辑
                 .and().sessionManagement()
-                .invalidSessionUrl("/login/invalid")
+                .invalidSessionUrl(SecurityConstants.INVALID_SESSION_URL)
 
                 //最大登录数
                 .maximumSessions(1)
                 //当达到最大值时，是否保留已经登录的用户 是否保留已经登录的用户；为true，新用户无法登录；为 false，旧用户被踢出
                 .maxSessionsPreventsLogin(false)
                 //当达到最大值时，旧用户被踢出后的操作
-                .expiredSessionStrategy(new CustomExpiredSessionStrategy())
+                .expiredSessionStrategy(new CommonSessionExpiredStrategy())
                 //踢出用户逻辑处理
                 .sessionRegistry(sessionRegistry());
 
