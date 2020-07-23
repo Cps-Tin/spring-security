@@ -52,6 +52,9 @@ public class DefaultAuthenticationProvider implements AuthenticationProvider {
     }
 
     private boolean validateVerify(String inputVerify) {
+        if("".equals(inputVerify) || inputVerify==null){
+            return false;
+        }
         //获取当前线程绑定的request对象
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         // 不分区大小写
@@ -60,7 +63,7 @@ public class DefaultAuthenticationProvider implements AuthenticationProvider {
 
         System.out.println("图形验证码：" + verifyCode + "用户输入：" + inputVerify);
 
-        return verifyCode.equalsIgnoreCase(inputVerify);
+        return inputVerify.equalsIgnoreCase(verifyCode);
     }
 
     @Override
